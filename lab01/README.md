@@ -162,7 +162,42 @@ Java 소스 코드에서 API 문서를 생성하는 도구입니다.
   java -jar app.jar
   ``` 
 
-### 9. Git 사용법
+### 9. `javac` 사용법
+
+Java 소스 코드를 컴파일할 때 사용하는 명령어입니다.
+
+- 단일 파일 컴파일
+  ```bash
+  javac App.java
+  ```
+- 여러 파일 컴파일
+  ```bash
+  javac App3.java Utils.java
+  ```
+  ```java
+  // App3.java 
+  public class App3 {
+    public static void main(String[] args) {
+      Utils.printMessage("hello, world");
+    }
+  }
+  // Utils.java
+  public class Utils {
+      public static void printMessage(String message) {
+          System.out.println(message);
+      }
+  }
+  ```
+- 소스 파일과 클래스 파일을 분리
+  ```bash
+  javac -d bin src/App4.java
+  ```
+- 패키지 소속 소스 파일 컴파일
+  ```bash
+  javac -d bin -sourcepath src src/org/example/myapp/App5.java
+  ```
+
+### 10. Git 사용법
 - Git 저장소 상태 확인
   ```bash
   # 현재 작업 디렉토리의 파일 상태 보기
