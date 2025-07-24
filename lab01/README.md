@@ -90,6 +90,7 @@
   ```bash
   # 컴파일
   javac App.java
+
   # 실행
   java App
   ```
@@ -117,13 +118,7 @@
 
 Java 소스 코드에서 API 문서를 생성하는 도구입니다.
 
-- Javadoc 생성
-  ```bash
-  javadoc -d doc App.java
-  ```
-- 생성된 문서 확인
-  - `doc` 폴더에 HTML 문서가 생성됩니다.
-- Javadoc 주석 추가
+- 자바 소스 파일에 Javadoc 주석 추가
   - `App.java` 파일에 Javadoc 주석 추가:
   ```java
   /**
@@ -140,6 +135,12 @@ Java 소스 코드에서 API 문서를 생성하는 도구입니다.
       }
   }
   ```
+- Javadoc 생성
+  ```bash
+  javadoc -d doc App.java
+  ```
+- 생성된 문서 확인
+  - `doc` 폴더에 HTML 문서가 생성됩니다.
 
 ### 8. `jar` 사용법
 
@@ -162,18 +163,25 @@ Java 소스 코드에서 API 문서를 생성하는 도구입니다.
   java -jar app.jar
   ``` 
 
-### 9. `javac` 사용법
+### 9. `javac`, `java` 사용법
 
-Java 소스 코드를 컴파일할 때 사용하는 명령어입니다.
+`javac`는 Java 소스 코드를 컴파일할 때 사용하는 프로그램입니다. `java`는 컴파일된 Java 프로그램을 실행할 때 사용하는 프로그램입니다.
 
-- 단일 파일 컴파일
+- 단일 파일 컴파일 및 실행
   ```bash
+  # 컴파일
   javac App.java
+
+  # 실행
+  java App
   ```
-- 여러 파일 컴파일
   ```bash
-  javac App3.java Utils.java
+  $ tree                      
+  .
+  ├── App.class
+  └── App.java
   ```
+- 여러 파일 컴파일 및 실행
   ```java
   // App3.java 
   public class App3 {
@@ -188,13 +196,68 @@ Java 소스 코드를 컴파일할 때 사용하는 명령어입니다.
       }
   }
   ```
+  ```bash
+  # 여러 파일 컴파일
+  javac App3.java Utils.java
+
+  # 실행
+  java App3
+  ```
+  ```bash
+  $ tree                      
+  .
+  ├── App3.class
+  ├── App3.java
+  ├── Utils.class
+  └── Utils.java
+  ```
 - 소스 파일과 클래스 파일을 분리
   ```bash
+  # 컴파일
   javac -d bin src/App4.java
+
+  # 실행
+  java -classpath bin App4
+  # 또는
+  java -cp bin App4
+  ```
+  ```bash
+  $ tree
+  .
+  ├── bin
+  │   ├── App4.class
+  │   └── Utils.class
+  └── src
+      ├── App4.java
+      └── Utils.java
+  
   ```
 - 패키지 소속 소스 파일 컴파일
   ```bash
+  # 컴파일
   javac -d bin -sourcepath src src/org/example/myapp/App5.java
+
+  # 실행
+  java -cp bin org.example.myapp.App5
+  ```
+  ```bash
+  $ tree
+  .
+  ├── bin
+  │   ├── org
+  │       └── example
+  │           ├── myapp
+  │           │   └── App5.class
+  │           └── util
+  │               └── Utils.class
+  │   
+  ├── src
+      └── org
+          └── example
+              ├── myapp
+              │   └── App5.java
+              └── util
+                  └── Utils.java
   ```
 
 ### 10. Git 사용법
