@@ -128,55 +128,75 @@
   gradle wrapper --gradle-version 8.14.3
   ```
 - Gradle 을 사용하여 수행할 수 있는 작업 목록 확인:
-```bash
-./gradlew tasks
-```
+  ```bash
+  ./gradlew tasks
+  ```
 - 자바 소스 코드 컴파일:
-```bash
-./gradlew compileJava
-``` 
+  ```bash
+  ./gradlew compileJava
+  ``` 
 - 자바 리소스 파일 처리:
-```bash
-./gradlew processResources
-```
+  ```bash
+  ./gradlew processResources
+  ```
 - 자바 애플리케이션 컴파일 및 리소스 처리 = `compileJava` + `processResources`:
-```bash
-./gradlew classes
-```
+  ```bash
+  ./gradlew classes
+  ```
 - 단위 테스트 소스 파일 컴파일:
-```bash
-./gradlew compileTestJava
-```
+  ```bash
+  ./gradlew compileTestJava
+  ```
 - 단위 테스트 리소스 파일 처리:
-```bash
-./gradlew processTestResources
-```
+  ```bash
+  ./gradlew processTestResources
+  ```
 - 자바 애플리케이션 실행:
-```bash
-# 단순 실행
-./gradlew run
-# 디버그 모드로 실행
-./gradlew run --debug
-# 실행 계획만 확인
-./gradlew run --dry-run
-# 실행 시 콘솔 출력 상세 모드
-./gradlew run --console=verbose
-# 실행 시 콘솔 출력 상세 모드 + 정보 출력
-./gradlew run --info --console=verbose
-# Gradle 실행 로그를 최소화하여 출력. 즉 애플리케이션 출력에 집중
-./gradlew run --quiet
-# Gradle 실행 로그를 최소화하여 출력. 색상 빼고 단순 텍스트로 출력
-./gradlew run --quiet --console=plain
-``` 
+  ```bash
+  # 단순 실행
+  ./gradlew run
+  # 디버그 모드로 실행
+  ./gradlew run --debug
+  # 실행 계획만 확인
+  ./gradlew run --dry-run
+  # 실행 시 콘솔 출력 상세 모드
+  ./gradlew run --console=verbose
+  # 실행 시 콘솔 출력 상세 모드 + 정보 출력
+  ./gradlew run --info --console=verbose
+  # Gradle 실행 로그를 최소화하여 출력. 즉 애플리케이션 출력에 집중
+  ./gradlew run --quiet
+  # Gradle 실행 로그를 최소화하여 출력. 색상 빼고 단순 텍스트로 출력
+  ./gradlew run --quiet --console=plain
+  ``` 
 - 테스트 실행:
-```bash
-./gradlew test  
-```
+  ```bash
+  ./gradlew test  
+  ```
 - JAR 파일(app.jar) 생성:
-```bash
-./gradlew jar --console=plain
-```
+  ```bash
+  ./gradlew jar --console=plain
+  ```
 - 전체 빌드 실행:
-```bash
-./gradlew build --console=plain
-```
+  ```bash
+  ./gradlew build --console=plain
+  ```
+
+### 6. 이전에 작성한 `App5.java` 파일과 `Utils.java` 파일을 Gradle 프로젝트로 변환
+
+- `App5.java` 파일을 `src/main/java/org/example/myapp/App.java`로 이동
+  - 클래스 이름을 `App5`에서 `App`으로 변경
+- `Utils.java` 파일을 `src/main/java/org/example/util/Utils.java`로 이동
+- 단위 테스트 자바 소스 파일(`src/test/java/org/example/AppTest.java`) 삭제
+- `myapp/app/build.gradle` 파일 수정
+  ```groovy
+  application {
+    mainClass = 'org.example.myapp.App'
+  }
+  ```
+- 자바 애플리케이션 실행
+  ```bash
+  # 단계 별 실행 작업 로그 출력
+  ./gradlew run --console=plain
+  # 애플리케이션 출력만 허용
+  ./gradlew run --quiet
+  ```
