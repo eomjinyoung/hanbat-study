@@ -183,9 +183,9 @@
 
 ### 6. 이전에 작성한 `App5.java` 파일과 `Utils.java` 파일을 Gradle 프로젝트로 변환
 
-- `App5.java` 파일을 `src/main/java/org/example/myapp/App.java`로 이동
+- `src/org/example/myapp/App5.java` 파일을 `src/main/java/org/example/myapp/App.java`로 이동
   - 클래스 이름을 `App5`에서 `App`으로 변경
-- `Utils.java` 파일을 `src/main/java/org/example/util/Utils.java`로 이동
+- `src/org/example/util/Utils.java` 파일을 `src/main/java/org/example/util/Utils.java`로 이동
 - 단위 테스트 자바 소스 파일(`src/test/java/org/example/AppTest.java`) 삭제
 - `myapp/app/build.gradle` 파일 수정
   ```groovy

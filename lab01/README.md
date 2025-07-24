@@ -244,20 +244,58 @@ Java 소스 코드에서 API 문서를 생성하는 도구입니다.
   $ tree
   .
   ├── bin
-  │   ├── org
+  │   └── org
   │       └── example
   │           ├── myapp
   │           │   └── App5.class
   │           └── util
   │               └── Utils.class
   │   
-  ├── src
+  └── src
       └── org
           └── example
               ├── myapp
               │   └── App5.java
               └── util
                   └── Utils.java
+  ```
+- 외부 라이브러리 사용
+  - [Guava JAR 파일 다운로드](https://search.maven.org/artifact/com.google.guava/guava)
+    - `guava-33.4.8-jre.jar` 파일 다운로드
+  - `lib` 폴더에 JAR 파일 저장
+  - `App6.java` 파일에서 Guava 라이브러리 사용
+  ```java
+  package org.example.myapp;
+  import com.google.common.base.Joiner;
+  public class App6 {
+      public static void main(String[] args) {
+          String message = Joiner.on(", ").join("hello", "world");
+          System.out.println(message);
+      }
+  }
+  ```
+  ```bash
+  # 컴파일
+  javac -cp lib/guava-33.4.8-jre.jar -d bin src/org/example/myapp/App6.java
+
+  # 실행
+  java -cp bin:lib/guava-33.4.8-jre.jar org.example.myapp.App6
+  ```
+  ```bash
+  $ tree
+  .
+  ├── bin
+  │   └── org
+  │       └── example
+  │           └── myapp
+  │               └── App6.class
+  ├── src
+  │   └── org
+  │       └── example
+  │           └── myapp
+  │               └── App6.java
+  └── lib
+      └── guava-33.4.8-jre.jar
   ```
 
 ### 10. Git 사용법
