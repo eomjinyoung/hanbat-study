@@ -1,0 +1,6 @@
+server:
+  port: 9999 # 서버 포트 번호
+
+spring:
+  application:
+    name: myapp # 애플리케이션 이름
