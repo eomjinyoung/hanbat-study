@@ -41,7 +41,7 @@ public class BoardController {
 
   @GetMapping("/view")
   public String view(@RequestParam("no") Long no, Model model) {
-    BoardDetailDto boardDetailDto = boardService.getBoardByNo(no);
+    BoardDetailDto boardDetailDto = boardService.getBoardByNoWithViewCount(no);
     model.addAttribute("board", BoardResponse.from(boardDetailDto)); // 모델에 게시글 추가
     return "board/view"; // 게시글 조회 페이지로 이동
   }
