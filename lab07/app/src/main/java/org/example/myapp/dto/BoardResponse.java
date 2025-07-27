@@ -1,13 +1,13 @@
-package org.example.myapp.domain;
+package org.example.myapp.dto;
 
 import java.time.LocalDateTime;
 
-public class Board {
+public class BoardResponse {
   private Long no;
   private String title;
   private String content;
-  private int viewCount;
   private LocalDateTime createdDate;
+  private int viewCount;
 
   public Long getNo() {
     return no;
@@ -33,6 +33,14 @@ public class Board {
     this.content = content;
   }
 
+  public LocalDateTime getCreatedDate() {
+    return createdDate;
+  }
+
+  public void setCreatedDate(LocalDateTime createdDate) {
+    this.createdDate = createdDate;
+  }
+
   public int getViewCount() {
     return viewCount;
   }
@@ -41,11 +49,13 @@ public class Board {
     this.viewCount = viewCount;
   }
 
-  public LocalDateTime getCreatedDate() {
-    return createdDate;
-  }
-
-  public void setCreatedDate(LocalDateTime createdDate) {
-    this.createdDate = createdDate;
+  public static BoardResponse from(BoardDetailDto dto) {
+    BoardResponse response = new BoardResponse();
+    response.setNo(dto.getNo());
+    response.setTitle(dto.getTitle());
+    response.setContent(dto.getContent());
+    response.setViewCount(dto.getViewCount());
+    response.setCreatedDate(dto.getCreatedDate());
+    return response;
   }
 }

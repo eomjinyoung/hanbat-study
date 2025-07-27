@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 작성</title>
+</head>
+<body>
+<h1>게시글 작성</h1>
+<form action="#" data-th-action="@{/board/add}" method="post">
+    <label for="title">제목:</label>
+    <input type="text" id="title" name="title" required><br>
+    <label for="content">내용:</label><br>
+    <textarea id="content" name="content" rows="4" cols="50" required></textarea><br>
+    <button type="submit">저장</button>
+</form>
+</body>
+</html>

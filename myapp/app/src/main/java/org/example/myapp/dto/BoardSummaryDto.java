@@ -1,11 +1,10 @@
-package org.example.myapp.domain;
+package org.example.myapp.dto;
 
 import java.time.LocalDateTime;
 
-public class Board {
+public class BoardSummaryDto {
   private Long no;
   private String title;
-  private String content;
   private int viewCount;
   private LocalDateTime createdDate;
 
@@ -23,14 +22,6 @@ public class Board {
 
   public void setTitle(String title) {
     this.title = title;
-  }
-
-  public String getContent() {
-    return content;
-  }
-
-  public void setContent(String content) {
-    this.content = content;
   }
 
   public int getViewCount() {

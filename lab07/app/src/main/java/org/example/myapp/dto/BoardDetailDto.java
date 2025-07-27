@@ -1,8 +1,8 @@
-package org.example.myapp.domain;
+package org.example.myapp.dto;
 
 import java.time.LocalDateTime;
 
-public class Board {
+public class BoardDetailDto {
   private Long no;
   private String title;
   private String content;

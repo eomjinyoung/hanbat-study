@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 조회</title>
+</head>
+<body>
+<h1>게시글 조회</h1>
+<form action="#" data-th-action="@{/board/update}" method="post">
+    <label for="no">번호:</label>
+    <input type="text" id="no" name="no" readonly data-th-value="${board.no}"><br>
+    <label for="title">제목:</label>
+    <input type="text" id="title" name="title" required data-th-value="${board.title}"><br>
+    <label for="content">내용:</label><br>
+    <textarea id="content" name="content" rows="4" cols="50" required data-th-text="${board.content}"></textarea><br>
+    <label for="created-date">작성일:</label>
+    <input type="text" id="created-date" readonly
+           data-th-value="${#temporals.format(board.createdDate, 'yyyy-MM-dd')}"><br>
+    <label for="view-count">조회수:</label>
+    <input type="text" id="view-count" readonly data-th-value="${board.viewCount}"><br>
+    <button type="submit">변경</button>
+</form>
+<form action="#" data-th-action="@{/board/delete}" method="post">
+    <input type="hidden" name="no" data-th-value="${board.no}">
+    <button type="submit">삭제</button>
+</form>
+<a href="/board/list">목록으로</a>
+</body>
+</html>
