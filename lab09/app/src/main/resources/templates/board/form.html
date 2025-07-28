@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 작성</title>
+    <style>
+        .error { color: red; font-size: 12px; }
+    </style>
+</head>
+<body>
+<h1>게시글 작성</h1>
+<form action="#" data-th-action="@{/board/add}" data-th-object="${boardCreateRequest}" method="post">
+    <label for="title">제목:</label>
+    <input type="text" id="title" data-th-field="*{title}" required><br>
+    <div class="error" data-th-if="${#fields.hasErrors('title')}" data-th-errors="*{title}"></div>
+
+    <label for="content">내용:</label><br>
+    <textarea id="content" data-th-field="*{content}" rows="4" cols="50" required></textarea><br>
+    <div class="error" data-th-if="${#fields.hasErrors('content')}" data-th-errors="*{content}"></div>
+    <button type="submit">저장</button>
+</form>
+</body>
+</html>

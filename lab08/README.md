@@ -94,7 +94,7 @@ docker exec -it -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 mysql-container mysql -ustudy 
       title VARCHAR(255) NOT NULL,
       content TEXT NOT NULL,
       view_count INT DEFAULT 0,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );
 
   # 테이블이 생성되었는지 확인합니다.
@@ -112,7 +112,7 @@ docker exec -it -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 mysql-container mysql -ustudy 
   desc boards;
   ```
 
-### 4. 게시글 데이터 CRUD 테스트
+### 4. 게시글 데이터 CRUD SQL 테스트
 
 - 게시글 데이터를 삽입합니다.
   ```sql
@@ -130,4 +130,144 @@ docker exec -it -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 mysql-container mysql -ustudy 
 - 게시글 데이터를 삭제합니다.
   ```sql
   DELETE FROM boards WHERE no = 2;
+  ```
+
+### 5. JDBC Driver 설정
+
+- `build.gradle` 파일에 MySQL JDBC Driver 의존성을 추가합니다.
+  ```groovy
+  dependencies {
+      implementation 'com.mysql:mysql-connector-j:9.3.0'
+  }
+  ```
+  - Gradle 패털에서 `모든 Gradle 프로젝트 동기화` 버튼을 클릭하여 의존성을 업데이트합니다.
+
+### 6. JDBC를 `BoardRepository` 클래스에 적용
+
+- 데이터베이스 연결코드를 작성합니다.
+  ```java
+  // 다음 필드를 추가합니다.
+  private final String url = "jdbc:mysql://localhost:3306/studydb";
+  private final String username = "study";
+  private final String password = "study";
+  private final Connection conn;
+  
+  // 생성자를 추가합니다.
+  public BoardRepository() throws Exception {
+    conn = DriverManager.getConnection(url, username, password);
+  }
+  ```
+- 게시글 목록을 조회하는 메서드를 변경합니다.
+  ```java
+  public List<BoardSummaryDto> findAll() {
+    List<BoardSummaryDto> boards = new ArrayList<>();
+    try (Statement stmt = conn.createStatement();
+        ResultSet rs =
+            stmt.executeQuery("SELECT no, title, created_date, view_count FROM boards")) {
+      while (rs.next()) {
+        BoardSummaryDto boardDto = new BoardSummaryDto();
+        boardDto.setNo(rs.getLong("no"));
+        boardDto.setTitle(rs.getString("title"));
+        boardDto.setViewCount(rs.getInt("view_count"));
+        boardDto.setCreatedDate(rs.getTimestamp("created_date").toLocalDateTime());
+        boards.add(boardDto);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("게시글 목록 조회 중 오류 발생", e);
+    }
+    return boards;
+  }
+  ```
+- 게시글 입력 메서드를 변경합니다.
+  ```java
+  public void save(BoardDto boardDto) {
+    String sql = "INSERT INTO boards (title, content) VALUES (?, ?)";
+    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+      pstmt.setString(1, boardDto.getTitle());
+      pstmt.setString(2, boardDto.getContent());
+      pstmt.executeUpdate();
+    } catch (Exception e) {
+      throw new RuntimeException("게시글 저장 중 오류 발생", e);
+    }
+  }
+  ``` 
+- 게시글 상세 조회 메서드를 변경합니다.
+  ```java
+  public BoardDetailDto findByNo(Long no) {
+    String sql = "SELECT no, title, content, view_count, created_date FROM boards WHERE no = ?";
+    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+      pstmt.setLong(1, no);
+      try (ResultSet rs = pstmt.executeQuery()) {
+        if (rs.next()) {
+          BoardDetailDto boardDto = new BoardDetailDto();
+          boardDto.setNo(rs.getLong("no"));
+          boardDto.setTitle(rs.getString("title"));
+          boardDto.setContent(rs.getString("content"));
+          boardDto.setViewCount(rs.getInt("view_count"));
+          boardDto.setCreatedDate(rs.getTimestamp("created_date").toLocalDateTime());
+          return boardDto;
+        } else {
+          throw new RuntimeException("게시글을 찾을 수 없습니다.");
+        }
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("게시글 상세 조회 중 오류 발생", e);
+    }
+  }
+  ```
+- 게시글 수정 메서드를 변경합니다.
+  ```java
+  public void update(Board board) {
+    String sql = "UPDATE boards SET title = ?, content = ? WHERE no = ?";
+    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+      pstmt.setString(1, board.getTitle());
+      pstmt.setString(2, board.getContent());
+      pstmt.setLong(3, board.getNo());
+      pstmt.executeUpdate();
+    } catch (Exception e) {
+      throw new RuntimeException("게시글 수정 중 오류 발생", e);
+    }
+  }
+  ```
+- 게시글 조회수를 증사시키는 메서드를 변경합니다.
+  ```java
+  public void updateViewCount(Long no) {
+    String sql = "UPDATE boards SET view_count = view_count + 1 WHERE no = ?";
+    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+      pstmt.setLong(1, no);
+      pstmt.executeUpdate();
+    } catch (Exception e) {
+      throw new RuntimeException("게시글 조회수 증가 중 오류 발생", e);
+    }
+  }
+  ```
+- 게시글 삭제 메서드를 변경합니다.
+  ```java
+  public void delete(Long no) {
+    String sql = "DELETE FROM boards WHERE no = ?";
+    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+      pstmt.setLong(1, no);
+      pstmt.executeUpdate();
+    } catch (Exception e) {
+      throw new RuntimeException("게시글 삭제 중 오류 발생", e);
+    }
+  }
+  ```
+- 게시글 개수를 리턴하는 메서드를 변경합니다.
+  ```java
+  public int count() {
+    String sql = "SELECT COUNT(*) FROM boards";
+    try (Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(sql)) {
+      rs.next();
+      return rs.getInt(1);
+    } catch (Exception e) {
+      throw new RuntimeException("게시글 개수 조회 중 오류 발생", e);
+    }
+  }
+  ```
+- 기존 코드에서 불필요한 코드를 삭제합니다.
+  ```java
+  private final List<Board> list = new ArrayList<>(); // 삭제 
+  private final Long nextNo = 1L; // 삭제
   ```

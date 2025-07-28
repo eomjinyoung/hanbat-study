@@ -54,7 +54,7 @@ public class BoardController {
   @PostMapping("/update")
   public String update(@ModelAttribute Board board) {
     Board old = boardService.getBoardByNo(board.getNo());
-    if (board == null) {
+    if (old == null) {
       return "redirect:/board/list"; // 게시글이 없으면 목록 페이지로 리다이렉트
     }
 
