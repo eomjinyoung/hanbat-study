@@ -28,3 +28,9 @@ tasks.named('test') {
 tasks.named('run') {
     standardInput = System.in
 }
+
+// Windows console에서 한글이 깨질 때
+tasks.withType(JavaExec) {
+    systemProperty 'sun.stdout.encoding', 'UTF-8'
+    systemProperty 'sun.stderr.encoding', 'UTF-8'
+}
