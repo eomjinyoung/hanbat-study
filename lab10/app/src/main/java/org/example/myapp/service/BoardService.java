@@ -24,19 +24,8 @@ public class BoardService {
     boardRepository.insert(board);
   }
 
-  public List<BoardResponse> getAllBoards() {
-    List<BoardSummaryDto> list = boardRepository.findAll();
-    return list.stream()
-        .map(
-            dto -> {
-              BoardResponse response = new BoardResponse();
-              response.setNo(dto.getNo());
-              response.setTitle(dto.getTitle());
-              response.setViewCount(dto.getViewCount());
-              response.setCreatedDate(dto.getCreatedDate());
-              return response;
-            })
-        .toList();
+  public List<BoardSummaryDto> getAllBoards() {
+    return boardRepository.findAll();
   }
 
   public BoardDetailDto getBoardByNo(Long no) {

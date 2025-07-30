@@ -58,4 +58,13 @@ public class BoardResponse {
     response.setCreatedDate(dto.getCreatedDate());
     return response;
   }
+
+  public static BoardResponse from(BoardSummaryDto dto) {
+    BoardResponse response = new BoardResponse();
+    response.setNo(dto.getNo());
+    response.setTitle(dto.getTitle());
+    response.setViewCount(dto.getViewCount());
+    response.setCreatedDate(dto.getCreatedDate());
+    return response;
+  }
 }

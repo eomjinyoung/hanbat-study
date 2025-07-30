@@ -7,7 +7,7 @@ public interface BoardService {
 
   void addBoard(BoardCreateRequest request);
 
-  List<BoardResponse> getAllBoards();
+  List<BoardSummaryDto> getAllBoards();
 
   BoardDetailDto getBoardByNo(Long no);
 
@@ -17,5 +17,5 @@ public interface BoardService {
 
   void deleteBoard(Long no);
 
-  int getBoardCount() ;
+  int getBoardCount();
 }

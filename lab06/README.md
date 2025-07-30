@@ -101,6 +101,15 @@
       response.setCreatedDate(dto.getCreatedDate());
       return response;
     }
+
+    public static BoardResponse from(BoardSummaryDto dto) {
+      BoardResponse response = new BoardResponse();
+      response.setNo(dto.getNo());
+      response.setTitle(dto.getTitle());
+      response.setViewCount(dto.getViewCount());
+      response.setCreatedDate(dto.getCreatedDate());
+      return response;
+    }
     // Getter/Setter 메서드 자동 생성
   }
   ```
@@ -126,25 +135,16 @@
   ```
 - `src/main/java/org/example/myapp/service/BoardService.java` 파일을 수정합니다.
   ```java
-  public List<BoardResponse> getAllBoards() {
-    List<BoardSummaryDto> list = boardRepository.findAll();
-    return list.stream()
-        .map(dto -> {
-          BoardResponse response = new BoardResponse();
-          response.setNo(dto.getNo());
-          response.setTitle(dto.getTitle());
-          response.setViewCount(dto.getViewCount());
-          response.setCreatedDate(dto.getCreatedDate());
-          return response;
-        })
-        .toList();
+  public List<BoardSummaryDto> getAllBoards() {
+    return boardRepository.findAll();
   }
   ```
 - `src/main/java/org/example/myapp/controller/BoardController.java` 파일을 수정합니다.
   ```java
   @GetMapping("/list")
   public String list(Model model) {
-    List<BoardResponse> boards = boardService.getAllBoards();
+    List<BoardSummaryDto> list = boardService.getAllBoards();
+    List<BoardResponse> boards = list.stream().map(BoardResponse::from).toList();
     model.addAttribute("boards", boards); // 모델에 게시글 목록 추가
     return "board/list"; // 게시글 목록 페이지로 이동
   }

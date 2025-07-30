@@ -100,7 +100,7 @@
 - `BoardRepository` 클래스를 인터페이스를 전환합니다.
   ```java
   @Mapper
-    public interface BoardRepository {
+  public interface BoardRepository {
 
     void insert(Board board);
 
@@ -115,7 +115,7 @@
     void delete(Long no);
 
     int count();
-    }
+  }
   ```
   - @Mapper 어노테이션을 사용하여 Mybatis가 이 인터페이스를 매핑할 수 있도록 합니다.
   - 인터페이스의 이름 및 패키지와 SQL Mapper 파일의 namespace 값이 일치해야 자동으로 매핑됩니다.

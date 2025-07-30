@@ -4,6 +4,7 @@ import java.util.List;
 import org.example.myapp.dto.BoardCreateRequest;
 import org.example.myapp.dto.BoardDetailDto;
 import org.example.myapp.dto.BoardResponse;
+import org.example.myapp.dto.BoardSummaryDto;
 import org.example.myapp.dto.BoardUpdateRequest;
 import org.example.myapp.service.BoardService;
 import org.springframework.stereotype.Controller;
@@ -34,7 +35,8 @@ public class BoardController {
 
   @GetMapping("/list")
   public String list(Model model) {
-    List<BoardResponse> boards = boardService.getAllBoards();
+    List<BoardSummaryDto> list = boardService.getAllBoards();
+    List<BoardResponse> boards = list.stream().map(BoardResponse::from).toList();
     model.addAttribute("boards", boards); // 모델에 게시글 목록 추가
     return "board/list"; // 게시글 목록 페이지로 이동
   }
