@@ -13,8 +13,24 @@
 
 ### 1. 백엔드에서 Rest API 구축하기
 
-- SpringBoot에서 RestController를 이용하여 API 엔드포인트를 생성합니다.
-- 게시판 CRUD 기능을 Rest API로 구현합니다.
+#### 1.1 Rest API 테스트 도구 준비
+
+- Postman 도구를 설치합니다.
+
+#### 1.2 Lombok 라이브러리 설치
+
+- `build.gradle` 파일에 다음 의존성을 추가합니다:
+  ```groovy
+  dependencies {
+      implementation 'org.projectlombok:lombok:1.18.38'
+      annotationProcessor 'org.projectlombok:lombok:1.18.38'
+  }
+  ```
+- Intellij IDEA에서 Lombok 플러그인을 설치합니다.
+  - Intellij IDEA에서 `Preferences > Plugins`로 이동하여 `Lombok` 플러그인을 검색하고 설치합니다.
+- Intellij IDEA에서 `Preferences > Build, Execution, Deployment > Compiler > Annotation Processors`로 이동하여 `Enable annotation processing`을 체크합니다.
+
+
 
 ### 2. 프론트엔드에서 AJAX 호출하기
 
