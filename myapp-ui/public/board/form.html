@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 작성</title>
+    <style>
+        #loading {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>게시글 작성</h1>
+        
+        <form id="boardForm">
+            <div>
+                <label for="title">제목 *</label>
+                <input type="text" id="title" name="title" required maxlength="100" placeholder="게시글 제목을 입력하세요">
+                <div class="error" id="titleError"></div>
+            </div>
+
+            <div>
+                <label for="content">내용 *</label>
+                <textarea id="content" name="content" rows="8" required maxlength="1000" placeholder="게시글 내용을 입력하세요"></textarea>
+                <div id="contentError"></div>
+            </div>
+
+            <div id="loading">
+                게시글을 저장하는 중...
+            </div>
+
+            <div>
+                <button type="submit" id="submitBtn">
+                    저장
+                </button>
+                <a href="/board">목록으로</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // 폼 유효성 검사
+        function validateForm() {
+            let isValid = true;
+            
+            // 에러 메시지 초기화
+            document.querySelectorAll('.error').forEach(error => {
+                error.style.display = 'none';
+                error.textContent = '';
+            });
+
+            // 제목 검사
+            const title = document.getElementById('title').value.trim();
+            if (!title) {
+                document.getElementById('titleError').textContent = '제목을 입력해주세요.';
+                document.getElementById('titleError').style.display = 'block';
+                isValid = false;
+            } else if (title.length > 100) {
+                document.getElementById('titleError').textContent = '제목은 100자 이내로 입력해주세요.';
+                document.getElementById('titleError').style.display = 'block';
+                isValid = false;
+            }
+
+            // 내용 검사
+            const content = document.getElementById('content').value.trim();
+            if (!content) {
+                document.getElementById('contentError').textContent = '내용을 입력해주세요.';
+                document.getElementById('contentError').style.display = 'block';
+                isValid = false;
+            } else if (content.length > 1000) {
+                document.getElementById('contentError').textContent = '내용은 1000자 이내로 입력해주세요.';
+                document.getElementById('contentError').style.display = 'block';
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // 게시글 저장
+        async function saveBoard(formData) {
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            
+            try {
+                // UI 상태 변경
+                submitBtn.disabled = true;
+                loading.style.display = 'block';
+                
+                const response = await fetch('http://localhost:9999/board/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: formData.get('title'),
+                        content: formData.get('content')
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.content || '서버 응답 오류!');
+                }
+
+                const jsonResult = await response.json();
+                if (jsonResult.status !== 'success') {
+                    throw new Error(jsonResult.content || '요청 처리 오류');
+                }
+
+                // 3초 후 목록 페이지로 이동
+                setTimeout(() => {
+                    window.location.href = '/board';
+                }, 100);
+
+            } catch (error) {
+                console.error('게시글 저장 오류:', error);
+                alert(error.message);
+            } finally {
+                // UI 상태 복원
+                submitBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        // 이벤트 리스너 설정
+        document.addEventListener('DOMContentLoaded', function() {
+            // 페이지 로드 애니메이션
+            const container = document.querySelector('.container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                container.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 2000);
+
+            // 폼 제출 이벤트
+            document.getElementById('boardForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (validateForm()) {
+                    const formData = new FormData(this);
+                    saveBoard(formData);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 목록</title>
+</head>
+<body>
+    <div class="container">
+        <h1>게시글 목록</h1>
+        
+        <div id="loading">
+            게시글을 불러오는 중...
+        </div>
+        
+        <div id="error" style="display: none;">
+            게시글을 불러오는 중 오류가 발생했습니다.
+        </div>
+        
+        <table id="boardTable" border="1" style="display: none;">
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th>작성일</th>
+                    <th>조회수</th>
+                </tr>
+            </thead>
+            <tbody id="boardTableBody">
+                <!-- 게시글 목록이 여기에 동적으로 추가됩니다 -->
+            </tbody>
+        </table>
+        
+        <div class="btn-container">
+            <a href="/board/form.html" class="btn">새 게시글</a>
+            <a href="/" class="btn btn-secondary">홈으로</a>
+        </div>
+    </div>
+
+    <script>
+        // 날짜 포맷팅 함수
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toISOString().split('T')[0];
+        }
+
+        // 게시글 목록 로드
+        async function loadBoards() {
+            try {
+                const response = await fetch('http://localhost:9999/board/list');
+                if (!response.ok) {
+                    throw new Error('서버 응답 오류');
+                }
+                
+                const jsonResult = await response.json();
+                if (jsonResult.status !== 'success') {
+                    throw new Error('요청 처리 오류');
+                }
+
+                const boards = jsonResult.content;
+
+                // 로딩 메시지 숨기기
+                document.getElementById('loading').style.display = 'none';
+                
+                if (boards.length === 0) {
+                    // 게시글이 없는 경우
+                    document.getElementById('boardTableBody').innerHTML = `
+                        <tr>
+                            <td colspan="4" class="no-data">게시글이 없습니다.</td>
+                        </tr>
+                    `;
+                } else {
+                    // 게시글 목록 렌더링
+                    document.getElementById('boardTableBody').innerHTML = boards.map(board => `
+                        <tr>
+                            <td>${board.no}</td>
+                            <td><a href="/board/view.html?no=${board.no}">${board.title}</a></td>
+                            <td>${formatDate(board.createdDate)}</td>
+                            <td>${board.viewCount}</td>
+                        </tr>
+                    `).join('');
+                }
+                
+                // 테이블 보이기
+                document.getElementById('boardTable').style.display = 'table';
+                
+            } catch (error) {
+                console.error('게시글 로드 오류:', error);
+                
+                // 로딩 메시지 숨기기
+                document.getElementById('loading').style.display = 'none';
+                
+                // 오류 메시지 표시
+                document.getElementById('error').style.display = 'block';
+                
+                // 빈 테이블 표시
+                document.getElementById('boardTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="4" class="no-data">게시글을 불러올 수 없습니다.</td>
+                    </tr>
+                `;
+                document.getElementById('boardTable').style.display = 'table';
+            }
+        }
+
+        // 페이지 로드 시 게시글 목록 로드
+        document.addEventListener('DOMContentLoaded', function() {
+            // 페이지 로드 애니메이션
+            const container = document.querySelector('.container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                container.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 1000);
+            
+            // 게시글 목록 로드
+            loadBoards();
+        });
+    </script>
+</body>
+</html>
