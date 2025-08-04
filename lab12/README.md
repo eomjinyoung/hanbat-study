@@ -94,9 +94,13 @@
     }
   ```
   - Postman에서 `http://localhost:8080/board/add` URL로 POST 요청을 보내고 응답 결과를 확인합니다.
-  - 요청 파라미터는 `Body` 탭에서 `x-www-form-urlencoded` 형식으로 전송합니다.
-    - title: 게시글 제목
-    - content: 게시글 내용
+  - 요청 파라미터는 `raw` 탭에서 `JSON` 형식으로 전송합니다.
+    ```json
+    {
+        "title": "제목",
+        "content": "1234567890"
+    }
+    ```
   - 제목과 내용을 최소 길이 이하 또는 이상으로 입력하여 검증 실패를 유도하여 에러 메시지를 확인합니다.
 - `update()` 메서드를 다음과 같이 변경합니다:  
   ```java
@@ -117,10 +121,14 @@
   }
   ```
   - Postman에서 `http://localhost:8080/board/update` URL로 PATCH 요청을 보내고 응답 결과를 확인합니다.
-  - 요청 파라미터는 `Body` 탭에서 `x-www-form-urlencoded` 형식으로 전송합니다.
-    - no: 게시글 번호
-    - title: 게시글 제목
-    - content: 게시글 내용
+  - 요청 파라미터는 `raw` 탭에서 `JSON` 형식으로 전송합니다.
+    ```json
+    {
+        "no": 21,
+        "title": "제목x",
+        "content": "1234567890x"
+    }
+    ```
   - 제목과 내용을 최소 길이 이하 또는 이상으로 입력하여 검증 실패를 유도하여 에러 메시지를 확인합니다.
 - `delete()` 메서드를 다음과 같이 변경합니다:  
   ```java
