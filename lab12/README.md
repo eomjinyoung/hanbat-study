@@ -241,13 +241,532 @@
     ```
 #### 2.6 게시글 목록 조회
 
-- `/board/list.html` 파일을 생성하고 다음 코드를 작성합니다:
-```html
+- `/board/index.html` 파일을 생성하고 다음 코드를 작성합니다:
+  ```html
+  <!DOCTYPE html>
+  <html lang="ko">
+  <head>
+      <meta charset="UTF-8">
+      <title>게시글 목록</title>
+  </head>
+  <body>
+      <div class="container">
+          <h1>게시글 목록</h1>
+          
+          <div id="loading">
+              게시글을 불러오는 중...
+          </div>
+          
+          <div id="error" style="display: none;">
+              게시글을 불러오는 중 오류가 발생했습니다.
+          </div>
+          
+          <table id="boardTable" border="1" style="display: none;">
+              <thead>
+                  <tr>
+                      <th>번호</th>
+                      <th>제목</th>
+                      <th>작성일</th>
+                      <th>조회수</th>
+                  </tr>
+              </thead>
+              <tbody id="boardTableBody">
+                  <!-- 게시글 목록이 여기에 동적으로 추가됩니다 -->
+              </tbody>
+          </table>
+          
+          <div class="btn-container">
+              <a href="/board/form.html" class="btn">새 게시글</a>
+              <a href="/" class="btn btn-secondary">홈으로</a>
+          </div>
+      </div>
 
-```
+      <script>
+          // 날짜 포맷팅 함수
+          function formatDate(dateString) {
+              const date = new Date(dateString);
+              return date.toISOString().split('T')[0];
+          }
+
+          // 게시글 목록 로드
+          async function loadBoards() {
+              try {
+                  const response = await fetch('http://localhost:9999/board/list');
+                  if (!response.ok) {
+                      throw new Error('서버 응답 오류');
+                  }
+                  
+                  const jsonResult = await response.json();
+                  if (jsonResult.status !== 'success') {
+                      throw new Error('요청 처리 오류');
+                  }
+
+                  const boards = jsonResult.content;
+
+                  // 로딩 메시지 숨기기
+                  document.getElementById('loading').style.display = 'none';
+                  
+                  if (boards.length === 0) {
+                      // 게시글이 없는 경우
+                      document.getElementById('boardTableBody').innerHTML = `
+                          <tr>
+                              <td colspan="4" class="no-data">게시글이 없습니다.</td>
+                          </tr>
+                      `;
+                  } else {
+                      // 게시글 목록 렌더링
+                      document.getElementById('boardTableBody').innerHTML = boards.map(board => `
+                          <tr>
+                              <td>${board.no}</td>
+                              <td><a href="/board/view.html?no=${board.no}">${board.title}</a></td>
+                              <td>${formatDate(board.createdDate)}</td>
+                              <td>${board.viewCount}</td>
+                          </tr>
+                      `).join('');
+                  }
+                  
+                  // 테이블 보이기
+                  document.getElementById('boardTable').style.display = 'table';
+                  
+              } catch (error) {
+                  console.error('게시글 로드 오류:', error);
+                  
+                  // 로딩 메시지 숨기기
+                  document.getElementById('loading').style.display = 'none';
+                  
+                  // 오류 메시지 표시
+                  document.getElementById('error').style.display = 'block';
+                  
+                  // 빈 테이블 표시
+                  document.getElementById('boardTableBody').innerHTML = `
+                      <tr>
+                          <td colspan="4" class="no-data">게시글을 불러올 수 없습니다.</td>
+                      </tr>
+                  `;
+                  document.getElementById('boardTable').style.display = 'table';
+              }
+          }
+
+          // 페이지 로드 시 게시글 목록 로드
+          document.addEventListener('DOMContentLoaded', function() {
+              // 페이지 로드 애니메이션
+              const container = document.querySelector('.container');
+              container.style.opacity = '0';
+              container.style.transform = 'translateY(20px)';
+              
+              setTimeout(() => {
+                  container.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                  container.style.opacity = '1';
+                  container.style.transform = 'translateY(0)';
+              }, 1000);
+              
+              // 게시글 목록 로드
+              loadBoards();
+          });
+      </script>
+  </body>
+  </html>
+  ```
  
+#### 2.7 게시글 등록
 
-- XMLHttpRequest를 이용하여 Rest API를 호출하는 방법을 배웁니다.
-- Fetch API를 이용하여 Rest API를 호출하는 방법을 배웁니다.
-- jQuery를 이용하여 Rest API를 호출하는 방법을 배웁니다.
-- Axios를 이용하여 Rest API를 호출하는 방법을 배웁니다.
+- `/board/form.html` 파일을 생성하고 다음 코드를 작성합니다:
+  ```html
+  <!DOCTYPE html>
+  <html lang="ko">
+  <head>
+      <meta charset="UTF-8">
+      <title>게시글 작성</title>
+      <style>
+          #loading {
+              display: none;
+          }
+      </style>
+  </head>
+  <body>
+      <div class="container">
+          <h1>게시글 작성</h1>
+          
+          <form id="boardForm">
+              <div>
+                  <label for="title">제목 *</label>
+                  <input type="text" id="title" name="title" required maxlength="100" placeholder="게시글 제목을 입력하세요">
+                  <div class="error" id="titleError"></div>
+              </div>
+
+              <div>
+                  <label for="content">내용 *</label>
+                  <textarea id="content" name="content" rows="8" required maxlength="1000" placeholder="게시글 내용을 입력하세요"></textarea>
+                  <div id="contentError"></div>
+              </div>
+
+              <div id="loading">
+                  게시글을 저장하는 중...
+              </div>
+
+              <div>
+                  <button type="submit" id="submitBtn">
+                      저장
+                  </button>
+                  <a href="/board">목록으로</a>
+              </div>
+          </form>
+      </div>
+
+      <script>
+          // 폼 유효성 검사
+          function validateForm() {
+              let isValid = true;
+              
+              // 에러 메시지 초기화
+              document.querySelectorAll('.error').forEach(error => {
+                  error.style.display = 'none';
+                  error.textContent = '';
+              });
+
+              // 제목 검사
+              const title = document.getElementById('title').value.trim();
+              if (!title) {
+                  document.getElementById('titleError').textContent = '제목을 입력해주세요.';
+                  document.getElementById('titleError').style.display = 'block';
+                  isValid = false;
+              } else if (title.length > 100) {
+                  document.getElementById('titleError').textContent = '제목은 100자 이내로 입력해주세요.';
+                  document.getElementById('titleError').style.display = 'block';
+                  isValid = false;
+              }
+
+              // 내용 검사
+              const content = document.getElementById('content').value.trim();
+              if (!content) {
+                  document.getElementById('contentError').textContent = '내용을 입력해주세요.';
+                  document.getElementById('contentError').style.display = 'block';
+                  isValid = false;
+              } else if (content.length > 1000) {
+                  document.getElementById('contentError').textContent = '내용은 1000자 이내로 입력해주세요.';
+                  document.getElementById('contentError').style.display = 'block';
+                  isValid = false;
+              }
+
+              return isValid;
+          }
+
+          // 게시글 저장
+          async function saveBoard(formData) {
+              const submitBtn = document.getElementById('submitBtn');
+              const loading = document.getElementById('loading');
+              
+              try {
+                  // UI 상태 변경
+                  submitBtn.disabled = true;
+                  loading.style.display = 'block';
+                  
+                  const response = await fetch('http://localhost:9999/board/add', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                          title: formData.get('title'),
+                          content: formData.get('content')
+                      })
+                  });
+
+                  if (!response.ok) {
+                      const errorData = await response.json();
+                      throw new Error(errorData.content || '서버 응답 오류!');
+                  }
+
+                  const jsonResult = await response.json();
+                  if (jsonResult.status !== 'success') {
+                      throw new Error(jsonResult.content || '요청 처리 오류');
+                  }
+
+                  // 3초 후 목록 페이지로 이동
+                  setTimeout(() => {
+                      window.location.href = '/board';
+                  }, 100);
+
+              } catch (error) {
+                  console.error('게시글 저장 오류:', error);
+                  alert(error.message);
+              } finally {
+                  // UI 상태 복원
+                  submitBtn.disabled = false;
+                  loading.style.display = 'none';
+              }
+          }
+
+          // 이벤트 리스너 설정
+          document.addEventListener('DOMContentLoaded', function() {
+              // 페이지 로드 애니메이션
+              const container = document.querySelector('.container');
+              container.style.opacity = '0';
+              container.style.transform = 'translateY(20px)';
+              
+              setTimeout(() => {
+                  container.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                  container.style.opacity = '1';
+                  container.style.transform = 'translateY(0)';
+              }, 2000);
+
+              // 폼 제출 이벤트
+              document.getElementById('boardForm').addEventListener('submit', function(e) {
+                  e.preventDefault();
+                  
+                  if (validateForm()) {
+                      const formData = new FormData(this);
+                      saveBoard(formData);
+                  }
+              });
+          });
+      </script>
+  </body>
+  </html>
+  ```
+
+#### 2.8 게시글 상세 조회
+
+- `/board/view.html` 파일을 생성하고 다음 코드를 작성합니다:
+  ```html
+  <!DOCTYPE html>
+  <html lang="ko">
+  <head>
+      <meta charset="UTF-8">
+      <title>게시글 조회</title>
+  </head>
+  <body>
+      <div class="container">
+          <h1>게시글 조회</h1>
+          
+          <div id="loading">
+              게시글을 불러오는 중...
+          </div>
+          
+          <div id="error" style="display: none;">
+              게시글을 불러오는 중 오류가 발생했습니다.
+          </div>
+          
+          <form id="boardForm" border="1" style="display: none;">
+              <div class="form-group">
+                  <label for="no">번호:</label>
+                  <input type="text" id="no" name="no" readonly>
+              </div>
+
+              <div class="form-group">
+                  <label for="title">제목:</label>
+                  <input type="text" id="title" name="title" required>
+                  <div class="error" id="titleError"></div>
+              </div>
+
+              <div class="form-group">
+                  <label for="content">내용:</label>
+                  <textarea id="content" name="content" rows="6" required></textarea>
+                  <div class="error" id="contentError"></div>
+              </div>
+
+              <div class="readonly-info">
+                  <div class="form-group">
+                      <label for="created-date">작성일:</label>
+                      <input type="text" id="created-date" readonly>
+                  </div>
+                  <div class="form-group">
+                      <label for="view-count">조회수:</label>
+                      <input type="text" id="view-count" readonly>
+                  </div>
+              </div>
+
+              <div class="btn-container">
+                  <button type="submit" class="btn btn-primary">변경</button>
+                  <button type="button" id="deleteBtn" class="btn btn-danger">삭제</button>
+                  <a href="/board" class="btn btn-secondary">목록으로</a>
+              </div>
+          </form>
+      </div>
+
+      <script>
+          let currentBoardNo = null;
+
+          // URL에서 게시글 번호 추출
+          function getBoardNoFromUrl() {
+              const urlParams = new URLSearchParams(window.location.search);
+              return urlParams.get('no');
+          }
+
+          // 날짜 포맷팅 함수
+          function formatDate(dateString) {
+              const date = new Date(dateString);
+              return date.toLocaleDateString('ko-KR', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit'
+              });
+          }
+
+          // 게시글 상세 정보 로드
+          async function loadBoard() {
+              const boardNo = getBoardNoFromUrl();
+              
+              if (!boardNo) {
+                  document.getElementById('loading').style.display = 'none';
+                  document.getElementById('error').style.display = 'block';
+                  document.getElementById('error').textContent = '게시글 번호가 필요합니다.';
+                  return;
+              }
+
+              try {
+                  const response = await fetch(`http://localhost:9999/board/view?no=${boardNo}`);
+                  
+                  if (!response.ok) {
+                      throw new Error('게시글을 찾을 수 없습니다.');
+                  }
+                  
+                  const jsonResult = await response.json();
+                  if (jsonResult.status !== 'success') {
+                      throw new Error('요청 처리 오류');
+                  }
+
+                  const board = jsonResult.content;
+
+                  currentBoardNo = board.no;
+                  
+                  // 폼에 데이터 채우기
+                  document.getElementById('no').value = board.no;
+                  document.getElementById('title').value = board.title;
+                  document.getElementById('content').value = board.content;
+                  document.getElementById('created-date').value = formatDate(board.createdDate);
+                  document.getElementById('view-count').value = board.viewCount;
+                  
+                  // 로딩 숨기고 폼 보이기
+                  document.getElementById('loading').style.display = 'none';
+                  document.getElementById('boardForm').style.display = 'block';
+                  
+              } catch (error) {
+                  console.error('게시글 로드 오류:', error);
+                  document.getElementById('loading').style.display = 'none';
+                  document.getElementById('error').style.display = 'block';
+                  document.getElementById('error').textContent = error.message;
+              }
+          }
+
+          // 게시글 수정
+          async function updateBoard(formData) {
+              try {
+                  const response = await fetch(`http://localhost:9999/board/update`, {
+                      method: 'PATCH',
+                      headers: {
+                          'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                          no: formData.get('no'),
+                          title: formData.get('title'),
+                          content: formData.get('content')
+                      })
+                  });
+
+                  if (!response.ok) {
+                      const errorData = await response.json();
+                      throw new Error(errorData.message || '수정에 실패했습니다.');
+                  }
+
+                  alert('게시글이 수정되었습니다.');
+                  // 페이지 새로고침하여 최신 데이터 표시
+                  window.location.reload();
+
+              } catch (error) {
+                  console.error('게시글 수정 오류:', error);
+                  alert(error.message);
+              }
+          }
+
+          // 게시글 삭제
+          async function deleteBoard() {
+              if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+                  return;
+              }
+
+              try {
+                  const response = await fetch(`http://localhost:9999/board/delete?no=${currentBoardNo}`, {
+                      method: 'DELETE'
+                  });
+                  if (!response.ok) {
+                      throw new Error('삭제에 실패했습니다.');
+                  }
+
+                  const jsonResult = await response.json();
+                  if (jsonResult.status !== 'success') {
+                      throw new Error('요청 처리 오류');
+                  }
+
+                  alert('게시글이 삭제되었습니다.');
+                  window.location.href = '/board';
+
+              } catch (error) {
+                  console.error('게시글 삭제 오류:', error);
+                  alert(error.message);
+              }
+          }
+
+          // 폼 유효성 검사
+          function validateForm(formData) {
+              let isValid = true;
+              
+              // 에러 메시지 초기화
+              document.querySelectorAll('.error').forEach(error => {
+                  error.style.display = 'none';
+                  error.textContent = '';
+              });
+
+              // 제목 검사
+              const title = formData.get('title').trim();
+              if (!title) {
+                  document.getElementById('titleError').textContent = '제목을 입력해주세요.';
+                  document.getElementById('titleError').style.display = 'block';
+                  isValid = false;
+              }
+
+              // 내용 검사
+              const content = formData.get('content').trim();
+              if (!content) {
+                  document.getElementById('contentError').textContent = '내용을 입력해주세요.';
+                  document.getElementById('contentError').style.display = 'block';
+                  isValid = false;
+              }
+
+              return isValid;
+          }
+
+          // 이벤트 리스너 설정
+          document.addEventListener('DOMContentLoaded', function() {
+              // 페이지 로드 애니메이션
+              const container = document.querySelector('.container');
+              container.style.opacity = '0';
+              container.style.transform = 'translateY(20px)';
+              
+              setTimeout(() => {
+                  container.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                  container.style.opacity = '1';
+                  container.style.transform = 'translateY(0)';
+              }, 100);
+
+              // 게시글 로드
+              loadBoard();
+
+              // 폼 제출 이벤트
+              document.getElementById('boardForm').addEventListener('submit', function(e) {
+                  e.preventDefault();
+                  
+                  const formData = new FormData(this);
+                  
+                  if (validateForm(formData)) {
+                      updateBoard(formData);
+                  }
+              });
+
+              // 삭제 버튼 이벤트
+              document.getElementById('deleteBtn').addEventListener('click', deleteBoard);
+          });
+      </script>
+  </body>
+  </html>
+  ```
