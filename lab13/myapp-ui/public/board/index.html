@@ -3,6 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>게시글 목록</title>
+    <style>
+        #loading {
+            display: none;
+        }
+        .error {
+            color: red;
+            font-size: 0.9em;
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -10,10 +20,6 @@
         
         <div id="loading">
             게시글을 불러오는 중...
-        </div>
-        
-        <div id="error" style="display: none;">
-            게시글을 불러오는 중 오류가 발생했습니다.
         </div>
         
         <table id="boardTable" border="1" style="display: none;">
@@ -88,9 +94,6 @@
                 
                 // 로딩 메시지 숨기기
                 document.getElementById('loading').style.display = 'none';
-                
-                // 오류 메시지 표시
-                document.getElementById('error').style.display = 'block';
                 
                 // 빈 테이블 표시
                 document.getElementById('boardTableBody').innerHTML = `

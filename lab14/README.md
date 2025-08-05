@@ -1,23 +1,21 @@
-# Lab13 - jQuery, Handlebars 사용하기
+# Lab14 - Axios 사용하기
 
 ## 개요
-이번 실습에서는 jQuery와 Handlebars를 사용하여 동적인 웹 페이지를 구현하는 방법을 배웁니다. jQuery는 HTML 문서 탐색, 이벤트 처리, 애니메이션 및 Ajax 상호 작용을 쉽게 할 수 있도록 도와주는 JavaScript 라이브러리입니다. Handlebars는 템플릿 엔진으로, HTML을 동적으로 생성하는 데 사용됩니다.
+이번 실습에서는 Axios를 사용하여 동적인 웹 페이지를 구현하는 방법을 배웁니다. Axios는 Promise 기반의 HTTP 클라이언트로, 브라우저와 Node.js에서 모두 사용할 수 있습니다. 이를 통해 API와의 통신을 쉽게 처리할 수 있습니다.
 
 ## 목표
 
-- jQuery 사용법
-- Handlebars 사용법
+- Axios 사용법
 
 ## 실습
 
-### 1. jQuery 및 Handlebars 자바스크립트 라이브러리 적용하기
+### 1. Axios 라이브러리 적용하기
 
-- jQuery와 Handlebars 라이브러리를 사용하는 페이지에 다음을 추가합니다.
+- Axios 라이브러리를 사용하는 페이지에 다음을 추가합니다.
   ```html
   <!-- CDN으로 라이브러리 로드 -->
   <head>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </head>
   ```
     
