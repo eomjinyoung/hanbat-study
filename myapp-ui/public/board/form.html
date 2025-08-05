@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>게시글 작성</title>
-    <!-- CDN으로 라이브러리 로드 -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        #loading {
+        #saving {
+            display: none;
+        }
+        .error {
+            color: red;
+            font-size: 0.9em;
             display: none;
         }
     </style>
@@ -18,17 +21,17 @@
         <form id="boardForm">
             <div>
                 <label for="title">제목 *</label>
-                <input type="text" id="title" name="title" required maxlength="100" placeholder="게시글 제목을 입력하세요">
+                <input type="text" id="title" name="title" required placeholder="게시글 제목을 입력하세요">
                 <div class="error" id="titleError"></div>
             </div>
 
             <div>
                 <label for="content">내용 *</label>
-                <textarea id="content" name="content" rows="8" required maxlength="1000" placeholder="게시글 내용을 입력하세요"></textarea>
-                <div id="contentError"></div>
+                <textarea id="content" name="content" rows="8" required placeholder="게시글 내용을 입력하세요"></textarea>
+                <div class="error" id="contentError"></div>
             </div>
 
-            <div id="loading">
+            <div id="saving">
                 게시글을 저장하는 중...
             </div>
 
@@ -42,44 +45,52 @@
     </div>
 
     <script>
-        // jQuery를 사용한 폼 유효성 검사
+        // 폼 유효성 검사
         function validateForm() {
             let isValid = true;
             
-            // 에러 메시지 초기화 (jQuery 방식)
-            $('.error').hide().text('');
+            // 에러 메시지 초기화
+            document.querySelectorAll('.error').forEach(error => {
+                error.style.display = 'none';
+                error.textContent = '';
+            });
 
-            // 제목 검사 (jQuery 방식)
-            const title = $('#title').val().trim();
-            console.log("제목:", title);
-            console.log("제목 길이:", title.length);
+            // 제목 검사
+            const title = document.getElementById('title').value.trim();
             if (!title) {
-                $('#titleError').text('제목을 입력해주세요.').show();
+                document.getElementById('titleError').textContent = '제목을 입력해주세요.';
+                document.getElementById('titleError').style.display = 'block';
                 isValid = false;
-            } else if (title.length > 100) {
-                $('#titleError').text('제목은 100자 이내로 입력해주세요.').show();
+            } else if (title.length < 2 || title.length > 100) {
+                document.getElementById('titleError').textContent = '제목은 2자 이상 100자 이내로 입력해주세요.';
+                document.getElementById('titleError').style.display = 'block';
                 isValid = false;
             }
 
-            // 내용 검사 (jQuery 방식)
-            const content = $('#content').val().trim();
+            // 내용 검사
+            const content = document.getElementById('content').value.trim();
             if (!content) {
-                $('#contentError').text('내용을 입력해주세요.').show();
+                document.getElementById('contentError').textContent = '내용을 입력해주세요.';
+                document.getElementById('contentError').style.display = 'block';
                 isValid = false;
-            } else if (content.length > 1000) {
-                $('#contentError').text('내용은 1000자 이내로 입력해주세요.').show();
+            } else if (content.length < 10 || content.length > 5000) {
+                document.getElementById('contentError').textContent = '내용은 10자 이상 5000자 이내로 입력해주세요.';
+                document.getElementById('contentError').style.display = 'block';
                 isValid = false;
             }
 
             return isValid;
         }
 
-        // jQuery를 사용한 게시글 저장
+        // 게시글 저장
         async function saveBoard(formData) {
+            const submitBtn = document.getElementById('submitBtn');
+            const saving = document.getElementById('saving');
+            
             try {
-                // UI 상태 변경 (jQuery 방식)
-                $('#submitBtn').prop('disabled', true);
-                $('#loading').show();
+                // UI 상태 변경
+                submitBtn.disabled = true;
+                saving.style.display = 'block';
                 
                 const response = await fetch('http://localhost:9999/board/add', {
                     method: 'POST',
@@ -102,7 +113,7 @@
                     throw new Error(jsonResult.content || '요청 처리 오류');
                 }
 
-                // 목록 페이지로 이동
+                // 0.1초 후 목록 페이지로 이동
                 setTimeout(() => {
                     window.location.href = '/board';
                 }, 100);
@@ -111,45 +122,32 @@
                 console.error('게시글 저장 오류:', error);
                 alert(error.message);
             } finally {
-                // UI 상태 복원 (jQuery 방식)
-                $('#submitBtn').prop('disabled', false);
-                $('#loading').hide();
+                // UI 상태 복원
+                submitBtn.disabled = false;
+                saving.style.display = 'none';
             }
         }
 
-        // jQuery 문서 준비 이벤트
-        $(document).ready(function() {
-            // 페이지 로드 애니메이션 (jQuery 방식)
-            $('.container').css({
-                opacity: '0',
-                transform: 'translateY(20px)'
-            }).delay(100).animate({
-                opacity: 1
-            }, 600).css('transform', 'translateY(0)');
+        // 이벤트 리스너 설정
+        document.addEventListener('DOMContentLoaded', function() {
+            // 페이지 로드 애니메이션
+            const container = document.querySelector('.container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                container.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 1000);
 
-            // 폼 제출 이벤트 (jQuery 방식)
-            $('#boardForm').on('submit', function(e) {
+            // 폼 제출 이벤트
+            document.getElementById('boardForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-
+                
                 if (validateForm()) {
-                    console.log("폼 유효성 검사 통과");
                     const formData = new FormData(this);
                     saveBoard(formData);
-                }
-            });
-
-            // 실시간 유효성 검사 (jQuery 방식 - 추가 기능)
-            $('#title').on('input', function() {
-                const title = $(this).val().trim();
-                if (title && title.length <= 100) {
-                    $('#titleError').hide();
-                }
-            });
-
-            $('#content').on('input', function() {
-                const content = $(this).val().trim();
-                if (content && content.length <= 1000) {
-                    $('#contentError').hide();
                 }
             });
         });

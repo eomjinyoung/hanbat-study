@@ -721,7 +721,6 @@
                         throw new Error('요청 처리 오류');
                     }
 
-                    alert('게시글이 삭제되었습니다.');
                     window.location.href = '/board';
 
                 } catch (error) {
