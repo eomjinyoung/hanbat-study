@@ -3,6 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>게시글 조회</title>
+    <style>
+        #loading {
+            display: none;
+        }
+        .error {
+            color: red;
+            font-size: 0.9em;
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -17,35 +27,35 @@
         </div>
         
         <form id="boardForm" border="1" style="display: none;">
-            <div class="form-group">
+            <div>
                 <label for="no">번호:</label>
                 <input type="text" id="no" name="no" readonly>
             </div>
 
-            <div class="form-group">
+            <div>
                 <label for="title">제목:</label>
                 <input type="text" id="title" name="title" required>
                 <div class="error" id="titleError"></div>
             </div>
 
-            <div class="form-group">
+            <div>
                 <label for="content">내용:</label>
                 <textarea id="content" name="content" rows="6" required></textarea>
                 <div class="error" id="contentError"></div>
             </div>
 
-            <div class="readonly-info">
-                <div class="form-group">
+            <div>
+                <div>
                     <label for="created-date">작성일:</label>
                     <input type="text" id="created-date" readonly>
                 </div>
-                <div class="form-group">
+                <div>
                     <label for="view-count">조회수:</label>
                     <input type="text" id="view-count" readonly>
                 </div>
             </div>
 
-            <div class="btn-container">
+            <div>
                 <button type="submit" class="btn btn-primary">변경</button>
                 <button type="button" id="deleteBtn" class="btn btn-danger">삭제</button>
                 <a href="/board" class="btn btn-secondary">목록으로</a>
@@ -192,12 +202,20 @@
                 document.getElementById('titleError').textContent = '제목을 입력해주세요.';
                 document.getElementById('titleError').style.display = 'block';
                 isValid = false;
+            } else if (title.length < 2 || title.length > 100) {
+                document.getElementById('titleError').textContent = '제목은 2자 이상 100자 이내로 입력해주세요.';
+                document.getElementById('titleError').style.display = 'block';
+                isValid = false;
             }
 
             // 내용 검사
             const content = formData.get('content').trim();
             if (!content) {
                 document.getElementById('contentError').textContent = '내용을 입력해주세요.';
+                document.getElementById('contentError').style.display = 'block';
+                isValid = false;
+            } else if (content.length < 10 || content.length > 5000) {
+                document.getElementById('contentError').textContent = '내용은 10자 이상 5000자 이내로 입력해주세요.';
                 document.getElementById('contentError').style.display = 'block';
                 isValid = false;
             }

@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>게시글 목록</title>
+    <!-- CDN으로 라이브러리 로드 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -36,14 +39,43 @@
         </div>
     </div>
 
+    <script id="boards-template" type="text/x-handlebars-template">
+        {{#each boards}}
+            <tr>
+                <td>{{no}}</td>
+                <td><a href="/board/view.html?no={{no}}">{{title}}</a></td>
+                <td>{{formatDate createdDate}}</td>
+                <td>{{viewCount}}</td>
+            </tr>
+        {{/each}}
+    </script>
     <script>
+        // jQuery를 사용한 개선된 코드
+        $(document).ready(function() {
+            // 페이지 로드 애니메이션 (jQuery 방식)
+            $('.container').css({
+                opacity: '0',
+                transform: 'translateY(20px)'
+            }).delay(100).animate({
+                opacity: 1
+            }, 600).css('transform', 'translateY(0)');
+            
+            // 게시글 목록 로드
+            loadBoards();
+        });
+
         // 날짜 포맷팅 함수
         function formatDate(dateString) {
             const date = new Date(dateString);
             return date.toISOString().split('T')[0];
         }
 
-        // 게시글 목록 로드
+        // Handlebars 헬퍼 등록
+        Handlebars.registerHelper('formatDate', function(dateString) {
+            return formatDate(dateString);
+        });
+
+        // 게시글 목록 로드 (jQuery + async/await 혼합)
         async function loadBoards() {
             try {
                 const response = await fetch('http://localhost:9999/board/list');
@@ -58,66 +90,44 @@
 
                 const boards = jsonResult.content;
 
-                // 로딩 메시지 숨기기
-                document.getElementById('loading').style.display = 'none';
+                // jQuery를 사용한 DOM 조작
+                $('#loading').hide();
                 
                 if (boards.length === 0) {
                     // 게시글이 없는 경우
-                    document.getElementById('boardTableBody').innerHTML = `
+                    $('#boardTableBody').html(`
                         <tr>
                             <td colspan="4" class="no-data">게시글이 없습니다.</td>
                         </tr>
-                    `;
+                    `);
                 } else {
                     // 게시글 목록 렌더링
-                    document.getElementById('boardTableBody').innerHTML = boards.map(board => `
-                        <tr>
-                            <td>${board.no}</td>
-                            <td><a href="/board/view.html?no=${board.no}">${board.title}</a></td>
-                            <td>${formatDate(board.createdDate)}</td>
-                            <td>${board.viewCount}</td>
-                        </tr>
-                    `).join('');
+                    // Handlebars 템플릿 사용
+                    const source = document.getElementById('boards-template').innerHTML;
+                    const template = Handlebars.compile(source);
+                    const html = template({ boards: boards });
+
+                    $('#boardTableBody').html(html);
                 }
                 
-                // 테이블 보이기
-                document.getElementById('boardTable').style.display = 'table';
+                // 테이블 보이기 (jQuery 방식)
+                $('#boardTable').fadeIn();
                 
             } catch (error) {
                 console.error('게시글 로드 오류:', error);
                 
-                // 로딩 메시지 숨기기
-                document.getElementById('loading').style.display = 'none';
+                // jQuery를 사용한 오류 처리
+                $('#loading').hide();
+                $('#error').show();
                 
-                // 오류 메시지 표시
-                document.getElementById('error').style.display = 'block';
-                
-                // 빈 테이블 표시
-                document.getElementById('boardTableBody').innerHTML = `
+                $('#boardTableBody').html(`
                     <tr>
                         <td colspan="4" class="no-data">게시글을 불러올 수 없습니다.</td>
                     </tr>
-                `;
-                document.getElementById('boardTable').style.display = 'table';
+                `);
+                $('#boardTable').fadeIn();
             }
         }
-
-        // 페이지 로드 시 게시글 목록 로드
-        document.addEventListener('DOMContentLoaded', function() {
-            // 페이지 로드 애니메이션
-            const container = document.querySelector('.container');
-            container.style.opacity = '0';
-            container.style.transform = 'translateY(20px)';
-            
-            setTimeout(() => {
-                container.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                container.style.opacity = '1';
-                container.style.transform = 'translateY(0)';
-            }, 1000);
-            
-            // 게시글 목록 로드
-            loadBoards();
-        });
     </script>
 </body>
 </html>
