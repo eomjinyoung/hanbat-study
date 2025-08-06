@@ -86,7 +86,7 @@
             $submitBtn.prop('disabled', true);
             $saving.show();
             
-            axios.post('http://localhost:9999/boards', {
+            axios.post('http://localhost:9999/board/add', {
                 title: formData.get('title'),
                 content: formData.get('content')
             }, {

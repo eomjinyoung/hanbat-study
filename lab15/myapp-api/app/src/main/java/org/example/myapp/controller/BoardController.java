@@ -4,11 +4,12 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.example.myapp.dto.*;
 import org.example.myapp.service.BoardService;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/boards")
+@RequestMapping("/board")
 public class BoardController {
 
   private final BoardService boardService;
@@ -17,7 +18,7 @@ public class BoardController {
     this.boardService = boardService;
   }
 
-  @PostMapping
+  @PostMapping("/add")
   public JsonResult add(
       @Valid @RequestBody BoardCreateRequest request, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
@@ -30,8 +31,8 @@ public class BoardController {
     return JsonResult.builder().status(JsonResult.SUCCESS).build();
   }
 
-  @GetMapping
-  public JsonResult list() {
+  @GetMapping("/list")
+  public JsonResult list(Model model) {
     List<BoardSummaryDto> boards = boardService.getAllBoards();
     return JsonResult.builder()
         .status(JsonResult.SUCCESS)
@@ -39,8 +40,8 @@ public class BoardController {
         .build();
   }
 
-  @GetMapping("/{no}")
-  public JsonResult view(@PathVariable("no") Long no) {
+  @GetMapping("/view")
+  public JsonResult view(@RequestParam("no") Long no, Model model) {
     BoardDetailDto boardDetailDto = boardService.getBoardByNoWithViewCount(no);
     return JsonResult.builder()
         .status(JsonResult.SUCCESS)
@@ -48,11 +49,9 @@ public class BoardController {
         .build();
   }
 
-  @PatchMapping("/{no}")
+  @PatchMapping("/update")
   public JsonResult update(
-      @PathVariable("no") Long no,
-      @Valid @RequestBody BoardUpdateRequest request,
-      BindingResult bindingResult) {
+      @Valid @RequestBody BoardUpdateRequest request, BindingResult bindingResult, Model model) {
 
     // 검증 실패 시 에러 응답
     if (bindingResult.hasErrors()) {
@@ -62,13 +61,12 @@ public class BoardController {
           .build();
     }
 
-    request.setNo(no);
     boardService.updateBoard(request);
     return JsonResult.builder().status(JsonResult.SUCCESS).build();
   }
 
-  @DeleteMapping("/{no}")
-  public JsonResult delete(@PathVariable("no") Long no) {
+  @DeleteMapping("/delete")
+  public JsonResult delete(@RequestParam("no") Long no) {
     boardService.deleteBoard(no);
     return JsonResult.builder().status(JsonResult.SUCCESS).build();
   }

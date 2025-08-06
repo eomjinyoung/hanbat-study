@@ -94,7 +94,7 @@
                 return;
             }
 
-            axios.get(`http://localhost:9999/boards/${boardNo}`)
+            axios.get(`http://localhost:9999/board/view?no=${boardNo}`)
                 .then(function(response) {
                     const jsonResult = response.data;
                     
@@ -133,7 +133,8 @@
 
         // 게시글 수정
         function updateBoard(formData) {
-            axios.patch(`http://localhost:9999/boards/${formData.get("no")}`, {
+            axios.patch('http://localhost:9999/board/update', {
+                no: formData.get('no'),
                 title: formData.get('title'),
                 content: formData.get('content')
             }, {
@@ -164,7 +165,7 @@
                 return;
             }
 
-            axios.delete(`http://localhost:9999/boards/${currentBoardNo}`)
+            axios.delete(`http://localhost:9999/board/delete?no=${currentBoardNo}`)
                 .then(function(response) {
                     const jsonResult = response.data;
                     

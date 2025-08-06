@@ -28,6 +28,7 @@
         <meta charset="UTF-8">
         <title>게시글 목록</title>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.min.js"></script>
         <style>
             #loading {
@@ -94,11 +95,10 @@
 
             // 게시글 목록 로드
             function loadBoards() {
-                $.ajax({
-                    url: 'http://localhost:9999/board/list',
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(jsonResult) {
+                axios.get('http://localhost:9999/board/list')
+                    .then(function(response) {
+                        const jsonResult = response.data;
+                        
                         if (jsonResult.status !== 'success') {
                             throw new Error('요청 처리 오류');
                         }
@@ -120,8 +120,8 @@
                         }
                         // 테이블 보이기
                         $('#boardTable').show();
-                    },
-                    error: function(xhr, status, error) {
+                    })
+                    .catch(function(error) {
                         console.error('게시글 로드 오류:', error);
                         
                         // 로딩 메시지 숨기기
@@ -130,8 +130,7 @@
                         // 빈 테이블 표시
                         $('#errorRow').show();
                         $('#boardTable').show();
-                    }
-                });
+                    });
             }
 
             // 페이지 로드 시 게시글 목록 로드
@@ -168,6 +167,7 @@
         <meta charset="UTF-8">
         <title>게시글 조회</title>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <style>
             #loading {
                 display: none;
@@ -257,11 +257,10 @@
                     return;
                 }
 
-                $.ajax({
-                    url: `http://localhost:9999/board/view?no=${boardNo}`,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(jsonResult) {
+                axios.get(`http://localhost:9999/board/view?no=${boardNo}`)
+                    .then(function(response) {
+                        const jsonResult = response.data;
+                        
                         if (jsonResult.status !== 'success') {
                             throw new Error('요청 처리 오류');
                         }
@@ -279,49 +278,47 @@
                         // 로딩 숨기고 폼 보이기
                         $('#loading').hide();
                         $('#boardForm').show();
-                    },
-                    error: function(xhr, status, error) {
+                    })
+                    .catch(function(error) {
                         console.error('게시글 로드 오류:', error);
                         
                         let errorMessage = '게시글을 찾을 수 없습니다.';
-                        if (xhr.status === 404) {
+                        if (error.response && error.response.status === 404) {
                             errorMessage = '게시글을 찾을 수 없습니다.';
-                        } else if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
+                        } else if (error.response && error.response.data && error.response.data.message) {
+                            errorMessage = error.response.data.message;
                         }
                         
                         $('#loading').hide();
                         $('#error').show().text(errorMessage);
-                    }
-                });
+                    });
             }
 
             // 게시글 수정
             function updateBoard(formData) {
-                $.ajax({
-                    url: 'http://localhost:9999/board/update',
-                    type: 'PATCH',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        no: formData.get('no'),
-                        title: formData.get('title'),
-                        content: formData.get('content')
-                    }),
-                    success: function(result) {
-                        alert('게시글이 수정되었습니다.');
-                        // 페이지 새로고침하여 최신 데이터 표시
-                        window.location.reload();
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('게시글 수정 오류:', error);
-                        
-                        let errorMessage = '수정에 실패했습니다.';
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
-                        }
-                        
-                        alert(errorMessage);
+                axios.patch('http://localhost:9999/board/update', {
+                    no: formData.get('no'),
+                    title: formData.get('title'),
+                    content: formData.get('content')
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
                     }
+                })
+                .then(function(response) {
+                    alert('게시글이 수정되었습니다.');
+                    // 페이지 새로고침하여 최신 데이터 표시
+                    window.location.reload();
+                })
+                .catch(function(error) {
+                    console.error('게시글 수정 오류:', error);
+                    
+                    let errorMessage = '수정에 실패했습니다.';
+                    if (error.response && error.response.data && error.response.data.message) {
+                        errorMessage = error.response.data.message;
+                    }
+                    
+                    alert(errorMessage);
                 });
             }
 
@@ -331,26 +328,25 @@
                     return;
                 }
 
-                $.ajax({
-                    url: `http://localhost:9999/board/delete?no=${currentBoardNo}`,
-                    type: 'DELETE',
-                    success: function(jsonResult) {
+                axios.delete(`http://localhost:9999/board/delete?no=${currentBoardNo}`)
+                    .then(function(response) {
+                        const jsonResult = response.data;
+                        
                         if (jsonResult.status !== 'success') {
                             throw new Error('요청 처리 오류');
                         }
                         window.location.href = '/board';
-                    },
-                    error: function(xhr, status, error) {
+                    })
+                    .catch(function(error) {
                         console.error('게시글 삭제 오류:', error);
                         
                         let errorMessage = '삭제에 실패했습니다.';
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
+                        if (error.response && error.response.data && error.response.data.message) {
+                            errorMessage = error.response.data.message;
                         }
                         
                         alert(errorMessage);
-                    }
-                });
+                    });
             }
 
             // 폼 유효성 검사
@@ -431,6 +427,7 @@
         <meta charset="UTF-8">
         <title>게시글 작성</title>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <style>
             #saving {
                 display: none;
@@ -512,39 +509,40 @@
                 $submitBtn.prop('disabled', true);
                 $saving.show();
                 
-                $.ajax({
-                    url: 'http://localhost:9999/board/add',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        title: formData.get('title'),
-                        content: formData.get('content')
-                    }),
-                    success: function(jsonResult) {
-                        if (jsonResult.status !== 'success') {
-                            throw new Error(jsonResult.content || '요청 처리 오류');
-                        }
-
-                        // 0.1초 후 목록 페이지로 이동
-                        setTimeout(() => {
-                            window.location.href = '/board';
-                        }, 100);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('게시글 저장 오류:', error);
-                        
-                        let errorMessage = '서버 응답 오류!';
-                        if (xhr.responseJSON && xhr.responseJSON.content) {
-                            errorMessage = xhr.responseJSON.content;
-                        }
-                        
-                        alert(errorMessage);
-                    },
-                    complete: function() {
-                        // UI 상태 복원
-                        $submitBtn.prop('disabled', false);
-                        $saving.hide();
+                axios.post('http://localhost:9999/board/add', {
+                    title: formData.get('title'),
+                    content: formData.get('content')
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
                     }
+                })
+                .then(function(response) {
+                    const jsonResult = response.data;
+                    
+                    if (jsonResult.status !== 'success') {
+                        throw new Error(jsonResult.content || '요청 처리 오류');
+                    }
+
+                    // 0.1초 후 목록 페이지로 이동
+                    setTimeout(() => {
+                        window.location.href = '/board';
+                    }, 100);
+                })
+                .catch(function(error) {
+                    console.error('게시글 저장 오류:', error);
+                    
+                    let errorMessage = '서버 응답 오류!';
+                    if (error.response && error.response.data && error.response.data.content) {
+                        errorMessage = error.response.data.content;
+                    }
+                    
+                    alert(errorMessage);
+                })
+                .finally(function() {
+                    // UI 상태 복원
+                    $submitBtn.prop('disabled', false);
+                    $saving.hide();
                 });
             }
 

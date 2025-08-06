@@ -4,6 +4,8 @@ import jakarta.validation.constraints.*;
 
 public class BoardUpdateRequest {
 
+  @NotNull(message = "게시글 번호는 필수입니다")
+  @Positive(message = "게시글 번호는 양수여야 합니다")
   private Long no;
 
   @NotBlank(message = "제목은 필수 입력 항목입니다")

@@ -1,10 +1,10 @@
 package org.example.myapp.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
-public class BoardUpdateRequest {
-
-  private Long no;
+public class BoardCreateRequest {
 
   @NotBlank(message = "제목은 필수 입력 항목입니다")
   @Size(min = 2, max = 100, message = "제목은 2자 이상 100자 이하로 입력해주세요")
@@ -14,14 +14,6 @@ public class BoardUpdateRequest {
   @NotBlank(message = "내용은 필수 입력 항목입니다")
   @Size(min = 10, max = 5000, message = "내용은 10자 이상 5000자 이하로 입력해주세요")
   private String content;
-
-  public Long getNo() {
-    return no;
-  }
-
-  public void setNo(Long no) {
-    this.no = no;
-  }
 
   public String getTitle() {
     return title;

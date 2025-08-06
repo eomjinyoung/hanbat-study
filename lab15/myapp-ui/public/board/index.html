@@ -71,7 +71,7 @@
 
         // 게시글 목록 로드
         function loadBoards() {
-            axios.get('http://localhost:9999/boards')
+            axios.get('http://localhost:9999/board/list')
                 .then(function(response) {
                     const jsonResult = response.data;
                     
