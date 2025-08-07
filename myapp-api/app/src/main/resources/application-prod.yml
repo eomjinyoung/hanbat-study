@@ -1,0 +1,22 @@
+server:
+  port: 8080 # 서버 포트 번호
+
+spring:
+  application:
+    name: myapp # 애플리케이션 이름
+  datasource:
+    url: jdbc:mysql://localhost:3306/studydb # DB URL
+    username: study # DB 사용자 이름
+    password: study # DB 비밀번호
+    driver-class-name: com.mysql.cj.jdbc.Driver # MySQL 드라이버 클래스
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQLDialect
+  web:
+    resources:
+      static-locations: classpath:/static/ # 정적 리소스 경로
+  thymeleaf:
+    prefix: classpath:/templates/ # 템플릿 파일 경로
+    suffix: .html # 템플릿 파일 확장자

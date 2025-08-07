@@ -89,7 +89,6 @@ export default function BoardForm() {
         return;
       }
 
-      alert('게시글이 성공적으로 등록되었습니다.');
       router.push('/boards'); // 게시글 목록으로 이동
     } catch (err) {
       console.error('게시글 등록 오류:', err);
