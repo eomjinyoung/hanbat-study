@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 목록</title>
+</head>
+<body>
+<h1>게시글 목록</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>번호</th>
+        <th>제목</th>
+        <th>작성일</th>
+        <th>조회수</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr data-th-if="${#lists.isEmpty(boards)}">
+        <td colspan="4">게시글이 없습니다.</td>
+    </tr>
+    <tr data-th-each="board : ${boards}">
+        <td data-th-text="${board.no}"></td>
+        <td><a data-th-href="@{/board/view(no=${board.no})}" data-th-text="${board.title}"></a></td>
+        <td data-th-text="${#temporals.format(board.createdDate, 'yyyy-MM-dd')}"></td>
+        <td data-th-text="${board.viewCount}"></td>
+    </tr>
+    </tbody>
+</table>
+<a href="/board/form">새 게시글</a>
+</body>
+</html>

@@ -1,0 +1,11 @@
+.next
+node_modules
+public
+build
+coverage
+out
+dist
+.vscode
+.git
+.DS_Store
+*.log
