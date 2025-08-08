@@ -1,0 +1,96 @@
+# hello-ui Kubernetes Deployment with NodePort Service
+# 접근 URL: http://localhost:30000
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${APP_NAME}
+  namespace: ${KUBE_NAMESPACE}
+  labels:
+    app: ${APP_NAME}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${APP_NAME}
+  template:
+    metadata:
+      labels:
+        app: ${APP_NAME}
+    spec:
+      containers:
+        - name: ${APP_NAME}
+          image: ${CI_REGISTRY_IMAGE}:${IMAGE_TAG}
+          imagePullPolicy: Never # 로컬 이미지 사용 (중요!)
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: ${APP_NAME}-config
+                  key: NODE_ENV
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: ${APP_NAME}-config
+                  key: PORT
+            # API 백엔드 URL 환경변수 추가 (선택사항)
+            - name: REACT_APP_API_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: ${APP_NAME}-config
+                  key: REACT_APP_API_BASE_URL
+                  optional: true
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+---
+# NodePort Service (외부 접근 가능)
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${APP_NAME}-service-nodeport
+  namespace: ${KUBE_NAMESPACE}
+  labels:
+    app: ${APP_NAME}
+spec:
+  selector:
+    app: ${APP_NAME}
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      nodePort: 30000  # 외부 접근 포트
+      name: http
+  type: NodePort
+---
+# Ingress 전용 ClusterIP 서비스 추가
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${APP_NAME}-service-ingress
+  namespace: default
+spec:
+  selector:
+    app: ${APP_NAME}  # 같은 Pod를 대상으로 함
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: ClusterIP
