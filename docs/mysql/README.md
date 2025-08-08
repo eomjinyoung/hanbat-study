@@ -8,7 +8,7 @@
     # 배포 상태 확인
     kubectl get pods,svc,pvc
 
-    # MySQL 컨테이너 로그 확인
+    # MySQL 컨테이너 로그 확인 
     kubectl logs deployment/mysql
 
     # 설정 파일 확인
