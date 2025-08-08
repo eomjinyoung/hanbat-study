@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function Header() {
   return (
     <header className="bg-blue-600 text-white p-4 shadow-md">
@@ -10,17 +12,17 @@ export default function Header() {
         <nav>
           <ul className="flex space-x-6">
             <li>
-              <a href="/" className="hover:text-blue-200 transition-colors">
+              <Link href="/" className="hover:text-blue-200 transition-colors">
                 홈
-              </a>
+              </Link>
             </li>
             <li>
-              <a
+              <Link
                 href="/boards"
                 className="hover:text-blue-200 transition-colors"
               >
                 게시판
-              </a>
+              </Link>
             </li>
           </ul>
         </nav>

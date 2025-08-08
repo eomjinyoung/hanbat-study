@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -54,7 +54,7 @@ export default function BoardView() {
   };
 
   // 게시글 로드
-  const loadBoard = async () => {
+  const loadBoard = useCallback(async () => {
     if (!boardNo) {
       setLoading(false);
       setError('게시글 번호가 필요합니다.');
@@ -103,12 +103,12 @@ export default function BoardView() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [boardNo]);
 
   // 컴포넌트 마운트 시 게시글 로드
   useEffect(() => {
     loadBoard();
-  }, [boardNo]);
+  }, [loadBoard]);
 
   // 입력값 변경 핸들러
   const handleInputChange = (e) => {

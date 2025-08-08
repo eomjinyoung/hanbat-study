@@ -61,10 +61,12 @@
     ```properties
     NEXT_PUBLIC_REST_API_URL=http://localhost:9999
     ```
+    - `npm run dev` 명령어로 개발 모드로 실행할 때는 이 파일의 환경변수를 사용한다.
 - `.env.production` 파일에 REST API 서버 주소를 등록한다.
     ```properties
     NEXT_PUBLIC_REST_API_URL=http://localhost:8080
     ```
+    - `npm run build` 명령어로 배포 파일을 만들면 이 파일의 환경변수를 사용한다.
 - 만약 개발 모드와 배포 모드의 포트 번호를 변경하고 싶다면, `package.json` 파일을 다음과 같이 수정합니다.
     ```json
     {
